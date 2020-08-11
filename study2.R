@@ -27,10 +27,7 @@ study2$anthro <- NA
 study2$anthro[complete.cases(study2[,c("Q47_1","Q47_2","Q47_3","Q47_4")])]<- p$x[,1]*-1
 
 
-###figs and results
-figt3_left <- screeplot(p, type = "barplot")
-
-fig3_right <- function(){
+fig4<- function(){
   tool_data<-as.numeric(as.matrix(study2[ (!study2$is_agent),'anthro']))
   agent_data<-as.numeric(as.matrix(study2[ (study2$is_agent),'anthro']))
   
@@ -59,27 +56,20 @@ fig3_right <- function(){
   tee<-t(ee)
   error.bar(BarPlot,tplot,tee)
 }
-
-fig3_right()
-
-tool_anthro_scores<-as.numeric(as.matrix(study2[ (!study2$is_agent),'anthro']))
-agent_anthro_scores<-as.numeric(as.matrix(study2[ (study2$is_agent),'anthro']))
-t.test(tool_anthro_scores, agent_anthro_scores, "less")
-
-fig4 <- function(raw){
-  mean_cr1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_1"])),na.rm = T)
-  mean_t1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_2"])),na.rm = T)
-  mean_a1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_3"])),na.rm = T)
-  mean_ca1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_4"])),na.rm = T)
-  mean_E1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_5"])),na.rm = T)
-  mean_cr3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_1"])),na.rm = T)
-  mean_t3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_2"])),na.rm = T)
-  mean_a3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_3"])),na.rm = T)
-  mean_ca3<-mean(as.numeric(as.matrix(raw[raw$is_agent,"RESP_4"])),na.rm = T)
-  mean_E3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_5"])),na.rm = T)
+fig5 <- function(){
+  mean_cr1<-mean(as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_1"])),na.rm = T)
+  mean_t1<-mean(as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_2"])),na.rm = T)
+  mean_a1<-mean(as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_3"])),na.rm = T)
+  mean_ca1<-mean(as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_4"])),na.rm = T)
+  mean_E1<-mean(as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_5"])),na.rm = T)
+  mean_cr3<-mean(as.numeric(as.matrix(study2[(study2$is_agent),"RESP_1"])),na.rm = T)
+  mean_t3<-mean(as.numeric(as.matrix(study2[(study2$is_agent),"RESP_2"])),na.rm = T)
+  mean_a3<-mean(as.numeric(as.matrix(study2[(study2$is_agent),"RESP_3"])),na.rm = T)
+  mean_ca3<-mean(as.numeric(as.matrix(study2[study2$is_agent,"RESP_4"])),na.rm = T)
+  mean_E3<-mean(as.numeric(as.matrix(study2[(study2$is_agent),"RESP_5"])),na.rm = T)
   
   se <- function(treatment, row){
-    data <- as.numeric(as.matrix(raw[(raw[,"is_agent"] == treatment),row]))
+    data <- as.numeric(as.matrix(study2[(study2[,"is_agent"] == treatment),row]))
     n <- length(data)
     s <- sd(data,na.rm = T)
     return(qt(0.975,df=n-1)*s/sqrt(n))
@@ -114,52 +104,18 @@ fig4 <- function(raw){
   tee<-t(ee)
   error.bar(BarPlot,tplot,tee)
 }
-
-fig4(study2)
-
-resp_ai_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"RESP_5"]))
-resp_ai_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_5"]))
-t.test(resp_ai_tool, resp_ai_agent, alternative = "greater")
-
-resp_artist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"RESP_3"]))
-resp_artis_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_3"]))
-t.test(resp_artist_tool, resp_artis_agent, alternative = "less")
-
-resp_technologist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"RESP_2"]))
-resp_technologist_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_2"]))
-t.test(resp_technologist_tool, resp_technologist_agent, alternative = "greater")
-
-summary(lm(RESP_5 ~ is_agent + valence + is_agent*valence, data=study2))
-summary(lm(RESP_2 ~ is_agent + valence + is_agent*valence, data=study2))
-summary(lm(RESP_3 ~ is_agent + valence + is_agent*valence, data=study2))
-
-summary(lm(RESP_1 ~ is_agent + valence + is_agent*valence, data=study2))
-summary(lm(RESP_4 ~ is_agent + valence + is_agent*valence, data=study2))
-
-summary(lm(MON_2 ~ is_agent + valence + is_agent*valence, data=study2))
-summary(lm(MON_3 ~ is_agent + valence + is_agent*valence, data=study2))
-
-summary(lm(MON_1 ~ is_agent + valence + is_agent*valence, data=study2))
-summary(lm(MON_4 ~ is_agent + valence + is_agent*valence, data=study2))
-
-resp_technologist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"MON_4"]))
-resp_technologist_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"MON_4"]))
-t.test(resp_technologist_tool, resp_technologist_agent, alternative = "greater")
-
-
-
-fig4 <- function(raw){
-  mean_cr1<-mean(as.numeric(as.matrix(raw[(!raw[,"is_agent"]),"MON_1"])),na.rm = T)
-  mean_t1<-mean(as.numeric(as.matrix(raw[(!raw[,"is_agent"]),"MON_2"])),na.rm = T)
-  mean_a1<-mean(as.numeric(as.matrix(raw[(!raw[,"is_agent"]),"MON_3"])),na.rm = T)
-  mean_ca1<-mean(as.numeric(as.matrix(raw[(!raw[,"is_agent"]),"MON_4"])),na.rm = T)
-  mean_cr3<-mean(as.numeric(as.matrix(raw[(raw[,"is_agent"]),"MON_1"])),na.rm = T)
-  mean_t3<-mean(as.numeric(as.matrix(raw[(raw[,"is_agent"]),"MON_2"])),na.rm = T)
-  mean_a3<-mean(as.numeric(as.matrix(raw[(raw[,"is_agent"]),"MON_3"])),na.rm = T)
-  mean_ca3<-mean(as.numeric(as.matrix(raw[(raw[,"is_agent"]),"MON_4"])),na.rm = T)
+fig6 <- function(){
+  mean_cr1<-mean(as.numeric(as.matrix(study2[!study2$is_agent,"MON_1"])),na.rm = T)
+  mean_t1<-mean(as.numeric(as.matrix(study2[!study2$is_agent,"MON_2"])),na.rm = T)
+  mean_a1<-mean(as.numeric(as.matrix(study2[!study2$is_agent,"MON_3"])),na.rm = T)
+  mean_ca1<-mean(as.numeric(as.matrix(study2[!study2$is_agent,"MON_4"])),na.rm = T)
+  mean_cr3<-mean(as.numeric(as.matrix(study2[study2$is_agent,"MON_1"])),na.rm = T)
+  mean_t3<-mean(as.numeric(as.matrix(study2[study2$is_agent,"MON_2"])),na.rm = T)
+  mean_a3<-mean(as.numeric(as.matrix(study2[study2$is_agent,"MON_3"])),na.rm = T)
+  mean_ca3<-mean(as.numeric(as.matrix(study2[study2$is_agent,"MON_4"])),na.rm = T)
   
   se <- function(treatment, row){
-    data <- as.numeric(as.matrix(raw[(raw[,"is_agent"] == treatment),row]))
+    data <- as.numeric(as.matrix(study2[(study2[,"is_agent"] == treatment),row]))
     n <- len(data)
     s <- sd(data,na.rm = T)
     return(qt(0.975,df=n-1)*s/sqrt(n))
@@ -193,10 +149,50 @@ fig4 <- function(raw){
   error.bar(BarPlot,tplot,tee)
 }
 
-mon_artist_tool <- as.numeric(as.matrix(study2[(study2[,"is_agent"]),"MON_3"]))
-mon_artis_agent <-as.numeric(as.matrix(study2[(!study2[,"is_agent"]),"MON_3"]))
+tool_anthro_scores<-as.numeric(as.matrix(study2[ (!study2$is_agent),'anthro']))
+agent_anthro_scores<-as.numeric(as.matrix(study2[ (study2$is_agent),'anthro']))
+t.test(tool_anthro_scores, agent_anthro_scores, "less")
+
+resp_ai_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"RESP_5"]))
+resp_ai_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_5"]))
+t.test(resp_ai_tool, resp_ai_agent, alternative = "greater")
+
+resp_artist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"RESP_3"]))
+resp_artis_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_3"]))
+t.test(resp_artist_tool, resp_artis_agent, alternative = "less")
+
+resp_technologist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"RESP_2"]))
+resp_technologist_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"RESP_2"]))
+t.test(resp_technologist_tool, resp_technologist_agent, alternative = "greater")
+
+summary(lm(RESP_5 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(RESP_2 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(RESP_3 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(RESP_1 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(RESP_4 ~ is_agent + valence + is_agent*valence, data=study2))
+
+
+
+mon_artist_tool <- as.numeric(as.matrix(study2[study2$is_agent,"MON_3"]))
+mon_artis_agent <-as.numeric(as.matrix(study2[!study2$is_agent,"MON_3"]))
 t.test(mon_artist_tool, mon_artis_agent, alternative = "less")
 
-mon_resp_technologist_agent_tool <- as.numeric(as.matrix(raw[(raw[,"is_agent"]),"MON_2"]))
-mon_resp_technologist_agent_agent <-as.numeric(as.matrix(raw[(!raw[,"is_agent"]),"MON_2"]))
+mon_resp_technologist_agent_tool <- as.numeric(as.matrix(raw[raw$is_agent,"MON_2"]))
+mon_resp_technologist_agent_agent <-as.numeric(as.matrix(raw[!raw$is_agent,"MON_2"]))
 t.test(mon_resp_technologist_agent_tool, mon_resp_technologist_agent_agent, alternative = "greater")
+
+resp_technologist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"MON_4"]))
+resp_technologist_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"MON_4"]))
+t.test(resp_technologist_tool, resp_technologist_agent, alternative = "greater")
+
+resp_technologist_tool <- as.numeric(as.matrix(study2[(study2$is_agent),"MON_4"]))
+resp_technologist_agent <-as.numeric(as.matrix(study2[(!study2$is_agent),"MON_4"]))
+t.test(resp_technologist_tool, resp_technologist_agent, alternative = "greater")
+
+
+summary(lm(MON_2 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(MON_3 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(MON_1 ~ is_agent + valence + is_agent*valence, data=study2))
+summary(lm(MON_4 ~ is_agent + valence + is_agent*valence, data=study2))
+
+

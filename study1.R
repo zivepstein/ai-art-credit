@@ -10,7 +10,7 @@ l <- function(x){
   return(d)
 }
 
-study1 <- read_csv("~/GDrive/research/thesis_submission/code/data/study1.csv")
+study1 <- read_csv("study1.csv")
 
 study1 <- study1[!is.na(study1$consent),]
 study1 <- study1[!is.na(study1$Q47_1),]
@@ -33,25 +33,22 @@ study1$anthro <- NA
 study1$anthro[complete.cases(study1[,c("Q47_1","Q47_2","Q47_3","Q47_4")])]<- p$x[,1]*-1
 study1$valence <- !is.na(study1$pos_credit_1)
 
-
-
-
-
+study1$is_agent = study1$anthro > median(study1$anthro)
 
 #Figure 2 left
-anthro_density1 <- density(study1$anthro[study1$valence], bw=0.5)
-anthro_density2 <- density(study1$anthro[!study1$valence], bw=0.5)
-plot(anthro_density2, main="", xlab = "Anthropomorphicity", xlim = c(2,12), type='n')
-legend("topright", cex = 0.75,
-       legend = c("Positive valence", "Negative valence"), 
-       fill = c(rgb(red = 0, green = 1, blue = 0, alpha = 0.5),rgb(red =1, green =0, blue = 0, alpha = 0.5))
-       )
-polygon(anthro_density1, col=rgb(red = 0, green = 1, blue = 0, alpha = 0.5))
-polygon(anthro_density2, col=rgb(red = 1, green =0, blue = 0, alpha = 0.5))
-
-
+fig2_left <- function(){
+  anthro_density1 <- density(study1$anthro[study1$valence], bw=0.5)
+  anthro_density2 <- density(study1$anthro[!study1$valence], bw=0.5)
+  plot(anthro_density2, main="", xlab = "Anthropomorphicity", xlim = c(2,12), type='n')
+  legend("topright", cex = 0.75,
+         legend = c("Positive valence", "Negative valence"), 
+         fill = c(rgb(red = 0, green = 1, blue = 0, alpha = 0.5),rgb(red =1, green =0, blue = 0, alpha = 0.5))
+  )
+  polygon(anthro_density1, col=rgb(red = 0, green = 1, blue = 0, alpha = 0.5))
+  polygon(anthro_density2, col=rgb(red = 1, green =0, blue = 0, alpha = 0.5))
+}
 #fiture 2 right
-fig1_right <- function(){
+fig2_right <- function(){
   tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)) & !study1$valence,'RESP_5']))
   agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) &! study1$valence ,'RESP_5']))
   tool_data2<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)) & study1$valence,'RESP_5']))
@@ -89,24 +86,20 @@ fig1_right <- function(){
   error.bar(BarPlot,tplot,tee)
 }
 
-fig1_right()
-
-study1$is_agent = study1$anthro > median(study1$anthro)
-
-fig4 <- function(raw){
-  mean_cr1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_1"])),na.rm = T)
-  mean_t1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_2"])),na.rm = T)
-  mean_a1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_3"])),na.rm = T)
-  mean_ca1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_4"])),na.rm = T)
-  mean_E1<-mean(as.numeric(as.matrix(raw[(!raw$is_agent),"RESP_5"])),na.rm = T)
-  mean_cr3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_1"])),na.rm = T)
-  mean_t3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_2"])),na.rm = T)
-  mean_a3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_3"])),na.rm = T)
-  mean_ca3<-mean(as.numeric(as.matrix(raw[raw$is_agent,"RESP_4"])),na.rm = T)
-  mean_E3<-mean(as.numeric(as.matrix(raw[(raw$is_agent),"RESP_5"])),na.rm = T)
+fig3 <- function(){
+  mean_cr1<-mean(as.numeric(as.matrix(study1[(!study1$is_agent),"RESP_1"])),na.rm = T)
+  mean_t1<-mean(as.numeric(as.matrix(study1[(!study1$is_agent),"RESP_2"])),na.rm = T)
+  mean_a1<-mean(as.numeric(as.matrix(study1[(!study1$is_agent),"RESP_3"])),na.rm = T)
+  mean_ca1<-mean(as.numeric(as.matrix(study1[(!study1$is_agent),"RESP_4"])),na.rm = T)
+  mean_E1<-mean(as.numeric(as.matrix(study1[(!study1$is_agent),"RESP_5"])),na.rm = T)
+  mean_cr3<-mean(as.numeric(as.matrix(study1[(study1$is_agent),"RESP_1"])),na.rm = T)
+  mean_t3<-mean(as.numeric(as.matrix(study1[(study1$is_agent),"RESP_2"])),na.rm = T)
+  mean_a3<-mean(as.numeric(as.matrix(study1[(study1$is_agent),"RESP_3"])),na.rm = T)
+  mean_ca3<-mean(as.numeric(as.matrix(study1[study1$is_agent,"RESP_4"])),na.rm = T)
+  mean_E3<-mean(as.numeric(as.matrix(study1[(study1$is_agent),"RESP_5"])),na.rm = T)
   
   se <- function(treatment, row){
-    data <- as.numeric(as.matrix(raw[(raw[,"is_agent"] == treatment),row]))
+    data <- as.numeric(as.matrix(study1[(study1[,"is_agent"] == treatment),row]))
     n <- length(data)
     s <- sd(data,na.rm = T)
     return(qt(0.975,df=n-1)*s/sqrt(n))
@@ -143,51 +136,33 @@ fig4 <- function(raw){
 }
 
 
-#summary statistics of anthro measure by valence
-mean(study1$anthro[study1$valence])
-sd(study1$anthro[study1$valence])
-
-mean(study1$anthro[!study1$valence])
-sd(study1$anthro[!study1$valence])
-
 #anthro and responsibiltiy
 resp_low_anthro<-as.numeric(as.matrix(study1[ study1$anthro < median(study1$anthro) ,'RESP_5']))
 resp_high_anthro<-as.numeric(as.matrix(study1[ study1$anthro >= median(study1$anthro) ,'RESP_5']))
 t.test(resp_low_anthro, resp_high_anthro, alternative = "less")
 
-################analyses
+#allocation of responsibility oto AI
 summary(lm(RESP_5 ~ anthro + valence + anthro*valence, data=study1))
-summary(lm(RESP_2 ~ anthro + valence + anthro*valence, data=study1))
-summary(lm(RESP_1 ~ anthro + valence + anthro*valence, data=study1))
-
 summary(lm(RESP_5 ~ anthro, data=study1[study1$valence,]))
-summary(lm(RESP_5 ~ anthro, data=study1[!study1$valence,]))#add scale 
+summary(lm(RESP_5 ~ anthro, data=study1[!study1$valence,])) 
 
-tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)) & !study1$valence,'RESP_5']))
-agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) &! study1$valence ,'RESP_5']))
-t.test(tool_data1, agent_data1, alternative = "less")
-
-tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)) & study1$valence,'RESP_5']))
-agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) &study1$valence ,'RESP_5']))
-t.test(tool_data1, agent_data1, alternative = "less")
-
+#allocation of responsibility to crowd
 tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)),'RESP_1']))
 agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) ,'RESP_1']))
 t.test(tool_data1, agent_data1, alternative = "less")
 
+#allocation of responsibility to technologist
+tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)),'RESP_2']))
+agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) ,'RESP_2']))
+t.test(tool_data1, agent_data1, alternative = "less")
 
+#allocation of responsibility to artist
+tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)),'RESP_3']))
+agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) ,'RESP_3']))
+t.test(tool_data1, agent_data1, alternative = "less")
 
+#allocation of responsibility to curator
+tool_data1<-as.numeric(as.matrix(study1[( study1$anthro < median(study1$anthro)),'RESP_4']))
+agent_data1<-as.numeric(as.matrix(study1[ (study1$anthro > median(study1$anthro)) ,'RESP_4']))
+t.test(tool_data1, agent_data1, alternative = "less")
 
-
-summary(lm(RESP_1 ~ is_agent + valence + is_agent*valence, data=study1)) # 0.20584
-
-summary(lm(RESP_2 ~ is_agent + valence + is_agent*valence, data=study1)) #  0.2293    
-
-summary(lm(RESP_3 ~ is_agent + valence + is_agent*valence, data=study1)) # 0.21724    
-
-summary(lm(RESP_4 ~ is_agent + valence + is_agent*valence, data=study1))  #  0.231    
-
-summary(lm(RESP_5 ~ anthro + valence + anthro*valence, data=study1))  #  0.231    
-
-summary(lm(RESP_5 ~ anthro, data=study1[study1$valence,]))  #  0.231    
-summary(lm(RESP_5 ~ anthro , data=study1))  #  0.231    
